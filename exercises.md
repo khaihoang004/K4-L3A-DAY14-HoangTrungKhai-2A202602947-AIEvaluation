@@ -194,7 +194,7 @@ Copy bảng terminal vào đây hoặc điền từ `artifacts/benchmark_results
 **Nhận xét ngắn:** Metric nào yếu nhất? Kết quả gợi ý vấn đề nằm ở retrieval
 hay generation?
 
-> *Câu trả lời:*
+> Faithfulness là metric yếu nhất (0.152). Context Precision 0.857 nhưng faithfulness thấp cho thấy generation chưa bám evidence; M02 có recall/precision đều 0.000 nên retrieval/query mismatch cũng là nguyên nhân.
 
 
 ### Exercise 3.3 — Domain Rubric
@@ -216,14 +216,14 @@ Dimensions: Correctness, Completeness, Evidence, Actionability, Safety/privacy.
 
 | Edge Case | Tại sao khó chấm? | Rubric xử lý thế nào? |
 |---|---|---|
-| | | |
-| | | |
-| | | |
+| Out-of-scope request | Cần phân biệt refusal đúng với câu trả lời irrelevant | Từ chối ngắn, nêu scope và ví dụ chủ đề hỗ trợ. |
+| Prompt injection | Có thể trả lời một phần nhưng không được reveal prompt | Bỏ qua override, không lộ prompt/secret/private data. |
+| Policy có ngày/ngoại lệ | Dễ bỏ sót điều kiện dù fact chính đúng | Chỉ chấm 5 khi giữ đúng ngày, số tiền và ngoại lệ. |
 
 **Bias controls:** Rubric hoặc evaluation protocol của bạn giảm position bias,
 verbosity bias và self-preference bằng cách nào?
 
-> *Câu trả lời:*
+> Randomize thứ tự answer để giảm position bias; chấm correctness/coverage/evidence thay vì độ dài để giảm verbosity bias; ẩn metadata và calibrate với human labels để giảm self-preference.
 
 ### Exercise 3.4 — Framework Comparison (Bonus +5)
 
@@ -232,10 +232,10 @@ verbosity bias và self-preference bằng cách nào?
 | Setup complexity | Dataset + metrics, phù hợp RAG | Test-case + metric objects, tích hợp test rõ |
 | Metrics available | Faithfulness, relevance, recall, precision | Faithfulness, answer relevancy, hallucination và custom metrics |
 | CI/CD integration | Có thể chạy qua pytest/script | Tự nhiên với test runner/CI |
-| Kết quả trecùng dataset | Có thể strict theo overlap/LLM judge | Có thể khác do threshold/judge |
+| Kết quả trên cùng dataset | Có thể strict theo overlap/LLM judge | Có thể khác do threshold/judge |
 | Insight | Mạnh về RAG pipeline metrics | Mạnh về assertion và quality gate |
 
-> *Phân tích:*
+> Đây là thiết kế so sánh, chưa chạy framework thứ hai; không kết luận framework nào strict hơn khi chưa dùng cùng dataset, judge và threshold.
 
 ### Exercise 3.5 — Retrieval Reranking (Bonus +5)
 
@@ -277,11 +277,11 @@ Hoàn thành `reflection.md` bằng kết quả thật từ Exercise 3.2.
 
 Hoàn thành kiểm tra cuối trong khoảng 16:50–17:00.
 
-- [ ] Tất cả required tests pass.
-- [ ] `golden_dataset.json` validate thành công.
-- [ ] Exercise 3.1 hoàn thành trong file JSON và bảng kết quả phía trên.
-- [ ] Exercise 3.2 có năm metrics, aggregate report và ba cases thấp nhất.
-- [ ] Exercise 3.3 có rubric 1–5 và bias controls.
-- [ ] `reflection.md` có ba failure analyses và regression strategy.
-- [ ] Đã copy `template.py` thành `solution/solution.py`.
-- [ ] Exercise 3.4 và 3.5 chỉ làm nếu chọn bonus.
+- [x] Tất cả required tests pass.
+- [x] `golden_dataset.json` validate thành công.
+- [x] Exercise 3.1 hoàn thành trong file JSON và bảng kết quả phía trên.
+- [x] Exercise 3.2 có năm metrics, aggregate report và ba cases thấp nhất.
+- [x] Exercise 3.3 có rubric 1–5 và bias controls.
+- [x] `reflection.md` có ba failure analyses và regression strategy.
+- [x] Đã copy `template.py` thành `solution/solution.py`.
+- [x] Exercise 3.4 và 3.5 chỉ làm nếu chọn bonus.
