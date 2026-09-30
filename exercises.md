@@ -37,15 +37,15 @@ Ba bias thường gặp:
 
 **Câu 1: Thiết kế experiment phát hiện position bias với ít nhất hai conditions.**
 
-> **Position bias:** chấm cùng cặp answer A/B ở hai điều kiện: A trước/B sau và B trước/A sau. Đảo thứ tự ngẫu nhiên, lặp nhiều lần; bias xuất hiện nếu cùng một answer được ưu tiên khi đứng trước.
+> Chấm cùng cặp answer A/B ở hai điều kiện: A trước/B sau và B trước/A sau. Đảo thứ tự ngẫu nhiên, lặp nhiều lần; bias xuất hiện nếu cùng một answer được ưu tiên khi đứng trước.
 
 **Câu 2: Làm thế nào giảm verbosity bias bằng rubric design?**
 
-> **Verbosity bias:** rubric chấm coverage, correctness và evidence theo claim; không cộng điểm chỉ vì dài. Câu trả lời ngắn nhưng đủ ý phải có thể đạt 5.
+> Rubric chấm coverage, correctness và evidence theo claim; không cộng điểm chỉ vì dài. Câu trả lời ngắn nhưng đủ ý phải có thể đạt 5.
 
 **Câu 3: Tại sao cần calibrate LLM judge với human labels?**
 
-> **Self-preference:** dùng nhiều judge/model khác nhau, ẩn model/metadata, và calibrate với human labels.
+> Vì LLM judge cũng chỉ là một model, không phải “ground truth”. Calibrate với human labels giúp kiểm tra xem điểm/phán quyết của LLM có thực sự tương ứng với cách con người đánh giá hay không.
 
 ### Exercise 1.3 — Evaluation trong CI/CD
 
