@@ -79,15 +79,15 @@ và retrieved chunks; không suy luận chỉ từ một score.
 
 **Root cause từ `find_root_cause()`:**
 
-> Query intent/coverage chưa được xử lý; bổ sung query rewrite và coverage guard.
+> Multiple issues detected — review full pipeline
 
 **Bạn đồng ý hay không? Dẫn evidence từ trace:**
 
-> Đồng ý. Trace cho thấy Retriever lấy chunk 01_product_catalog.md nhưng chunk nói về HomeHub compatibility, không nói mục đích catalog. Root cause phù hợp với điểm thấp nhất và cần fix ở query intent/coverage chưa được xử lý; bổ sung query rewrite và coverage guard..
+> Đồng ý một phần. Analyzer chỉ nhìn scores nên trả về “Multiple issues detected”. Trace cho thấy chunk product catalog được lấy nhưng thiếu nội dung trả lời meta; đây là giả thuyết cần kiểm tra bằng query expansion và coverage check.
 
 **Proposed fix cụ thể:**
 
-> Query intent/coverage chưa được xử lý; bổ sung query rewrite và coverage guard.
+> Thêm query rewrite cho intent “product catalog purpose”, coverage check trước refusal và regression test E05.
 
 ### Failure 2
 
@@ -120,7 +120,7 @@ và retrieved chunks; không suy luận chỉ từ một score.
 
 **Root cause và proposed fix:**
 
-> Đồng ý. Trace cho thấy Top chunk là 00_system_scope.md thay vì 02_orders_and_payments.md. Root cause phù hợp với điểm thấp nhất và cần fix ở lexical mismatch trong retrieval; thêm synonym expansion và category routing..
+> Analyzer: Multiple issues detected — review full pipeline. Trace xác nhận retrieval sai tài liệu: top chunk là 00_system_scope.md thay vì 02_orders_and_payments.md. Fix: synonym expansion/category routing cho payment và regression test M02.
 
 ### Failure 3
 
@@ -153,7 +153,7 @@ và retrieved chunks; không suy luận chỉ từ một score.
 
 **Root cause và proposed fix:**
 
-> Đồng ý. Trace cho thấy Retrieved chunk 03_promotions_and_membership.md là evidence hợp lệ nhưng response biến false premise thành claim discount. Root cause phù hợp với điểm thấp nhất và cần fix ở thiếu guardrail cho promise/false premise; trả limitation trước rồi mới nêu policy..
+> Analyzer: Context is missing or irrelevant — improve retrieval. Mình không hoàn toàn đồng ý: precision là 1.000 và trace có đúng promotions chunk; nguyên nhân thực tế có vẻ là thiếu guardrail xử lý “guarantee”/false premise. Cần kiểm tra bằng prompt guardrail và regression case.
 
 ---
 
@@ -178,11 +178,29 @@ Paste output của `generate_improvement_log()`:
 
 ```text
 | Failure ID | Type | Root Cause | Suggested Fix | Status |
-|---|---|---|---|---|
-| F001 | hallucination | Generation không grounded | Thêm grounding guardrail | Open |
-| F002 | hallucination | BM25 lexical mismatch | Query expansion và category routing | Open |
-| F003 | off_topic | Thiếu policy guardrail | Template xử lý limitation/privacy | Open |
+|------------|------|------------|---------------|--------|
+| F001 | hallucination | Context is missing or irrelevant — improve retrieval | Add a faithfulness guardrail for unsupported claims | Open |
+| F002 | hallucination | Context is missing or irrelevant — improve retrieval | Add out-of-scope detection and domain templates | Open |
+| F003 | off_topic | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F004 | hallucination | Multiple issues detected — review full pipeline | Review retrieval and generation trace | Open |
+| F005 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F006 | hallucination | Multiple issues detected — review full pipeline | Review retrieval and generation trace | Open |
+| F007 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F008 | hallucination | Answer is missing key information — increase context window or improve generation | Review retrieval and generation trace | Open |
+| F009 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F010 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F011 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F012 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F013 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F014 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F015 | off_topic | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F016 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F017 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F018 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
+| F019 | hallucination | Context is missing or irrelevant — improve retrieval | Review retrieval and generation trace | Open |
 ```
+
+**Mapping failure IDs với QA cases:** F001=E02, F002=E03, F003=E04, F004=E05, F005=M01, F006=M02, F007=M03, F008=M04, F009=M05, F010=M06, F011=M07, F012=H01, F013=H02, F014=H03, F015=H04, F016=H05, F017=A01, F018=A02, F019=A03.
 
 **Ba improvement suggestions ưu tiên**
 
