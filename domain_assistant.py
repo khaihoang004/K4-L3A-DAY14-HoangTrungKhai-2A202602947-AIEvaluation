@@ -16,7 +16,7 @@ import time
 from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -244,26 +244,44 @@ class TextGenerator(Protocol):
 
 class OpenAIGenerator:
     def __init__(self, max_output_tokens: int = 300) -> None:
-        api_key = os.getenv("OPENAI_API_KEY", "").strip()
-        self.model = os.getenv("OPENAI_MODEL", "").strip()
+        api_key = os.getenv("GEMINI_API_KEY", "").strip()
+        self.model = os.getenv("GEMINI_MODEL", "").strip()
+        self.fallback_model = os.getenv(
+            "GEMINI_FALLBACK_MODEL", "gemini-3.1-flash-lite"
+        ).strip()
         if not api_key:
-            raise RuntimeError("OPENAI_API_KEY is missing from .env")
+            raise RuntimeError("GEMINI_API_KEY is missing from .env")
         if not self.model:
-            raise RuntimeError("OPENAI_MODEL is missing from .env")
-        self.client = OpenAI(api_key=api_key)
+            raise RuntimeError("GEMINI_MODEL is missing from .env")
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        )
         self.max_output_tokens = max_output_tokens
 
     def generate(self, prompt: str) -> str:
-        response = self.client.responses.create(
-            model=self.model,
-            input=prompt,
-            temperature=0,
-            max_output_tokens=self.max_output_tokens,
-        )
-        answer = response.output_text.strip()
-        if not answer:
-            raise RuntimeError("OpenAI returned an empty answer")
-        return answer
+        models = [self.model]
+        if self.fallback_model and self.fallback_model != self.model:
+            models.append(self.fallback_model)
+
+        errors: list[str] = []
+        for model in models:
+            try:
+                response = self.client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0,
+                    max_tokens=self.max_output_tokens,
+                )
+                answer = (response.choices[0].message.content or "").strip()
+                if not answer:
+                    raise RuntimeError("empty answer")
+                self.model = model
+                return answer
+            except (OpenAIError, RuntimeError, TypeError, ValueError) as exc:
+                errors.append(f"{model}: {exc}")
+
+        raise RuntimeError("All Gemini models failed: " + " | ".join(errors))
 
 
 @dataclass(frozen=True)
@@ -455,7 +473,7 @@ def generate_actual_answers(
     return {
         "schema_version": "1.0",
         "corpus_id": assistant.corpus_id,
-        "generated_at": datetime.now(UTC).isoformat(),
+        "generated_at": datetime.now().isoformat(),
         "agent": {
             "name": "domain-assistant",
             "model": model,
